@@ -1,14 +1,12 @@
 export default async function handler(req, res) {
   console.log("➡️ API route hit");
 
-  // 1️⃣ Method check
   if (req.method !== "POST") {
     console.error("❌ Invalid method:", req.method);
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    // 2️⃣ Log request body
     console.log("📦 Request body:", req.body);
 
     const { data, prompt } = req.body;
@@ -18,15 +16,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing data or prompt" });
     }
 
-    // 3️⃣ Check env variable (DON’T log the actual key)
-    if (!process.env.OPENAI_API_KEY) {
+    // Check OpenAI key from environment variables
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    if (!OPENAI_API_KEY) {
       console.error("❌ OPENAI_API_KEY is undefined");
       return res.status(500).json({ error: "OpenAI API key not configured" });
     }
-
     console.log("🔐 OpenAI key exists");
 
-    // 4️⃣ Call OpenAI
+    // Call OpenAI API
     console.log("🚀 Calling OpenAI API...");
     const openaiRes = await fetch(
       "https://api.openai.com/v1/chat/completions",
@@ -34,7 +32,7 @@ export default async function handler(req, res) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
@@ -56,7 +54,6 @@ export default async function handler(req, res) {
 
     console.log("📡 OpenAI response status:", openaiRes.status);
 
-    // 5️⃣ Handle OpenAI API errors
     if (!openaiRes.ok) {
       const errorText = await openaiRes.text();
       console.error("❌ OpenAI API error:", errorText);
@@ -70,7 +67,6 @@ export default async function handler(req, res) {
       openaiData.choices?.[0]?.message?.content ||
       "<div>AI did not return HTML.</div>";
 
-    // 6️⃣ Final response
     console.log("📤 Sending HTML response");
     return res.status(200).json({ html });
   } catch (error) {
