@@ -6,7 +6,6 @@ export default async function handler(req, res) {
   console.log("➡️ API route hit");
 
   if (req.method !== "POST") {
-    console.error("❌ Invalid method:", req.method);
     return res.status(405).json({ error: "Method not allowed" });
   }
 
@@ -16,23 +15,34 @@ export default async function handler(req, res) {
     const { data, prompt } = req.body;
 
     if (!data || !prompt) {
-      console.error("❌ Missing data or prompt");
       return res.status(400).json({ error: "Missing data or prompt" });
     }
 
-    // ✅ Check Groq key
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
     if (!GROQ_API_KEY) {
       console.error("❌ GROQ_API_KEY is undefined");
       return res.status(500).json({ error: "Groq API key not configured" });
     }
-    console.log("🔐 Groq key exists");
 
+    // Strong system prompt with inline CSS instructions
     const systemPrompt = `
 You are a frontend developer.
+You will receive JSON data in this format:
+{
+  "report_title": "string",
+  "currency": "string",
+  "expenses": [
+    {"item": "string", "amount": number},
+    ...
+  ]
+}
 Return ONLY valid HTML and CSS.
-Do NOT include explanations.
-Use the provided JSON data exactly.
+- Include all CSS inline using a <style> tag in the HTML head.
+- Use a professional font (system-ui, Helvetica, Arial) and a light grey background (#f9f9f9).
+- Table should have column headers (Item, Amount), alternating row colors, padding, and borders.
+- Calculate total spending by summing all "amount" values.
+- Do NOT include explanations or external stylesheets.
+- Make HTML fully renderable in a browser.
 `;
 
     console.log("🚀 Calling Groq API...");
@@ -49,11 +59,14 @@ Use the provided JSON data exactly.
           model: "llama-3.3-70b-versatile",
           messages: [
             { role: "system", content: systemPrompt },
-            { role: "user", content: JSON.stringify(data) },
+            {
+              role: "user",
+              content: `const reportData = ${JSON.stringify(data)};`,
+            },
             { role: "user", content: prompt },
           ],
           temperature: 0.2,
-          max_tokens: 1200,
+          max_tokens: 1500,
         }),
       },
     );
