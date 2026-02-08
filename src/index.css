@@ -1,10 +1,11 @@
+/* ---------- Root & Body Styles ---------- */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: #000; /* text color changed to black */
+  color: #000; /* global text color black */
   background-color: #f9f9f9; /* light grey background */
 
   font-synthesis: none;
@@ -13,6 +14,32 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  margin: 0;
+  font-family: inherit;
+  color: #000; /* ensure body text is black */
+  background-color: #f9f9f9;
+  line-height: 1.5;
+}
+
+/* ---------- Container for Inputs ---------- */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 2em;
+  max-width: 800px;
+  margin: 0 auto;
+  gap: 1em;
+}
+
+/* ---------- Headings ---------- */
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+/* ---------- Links ---------- */
 a {
   font-weight: 500;
   color: #646cff;
@@ -22,20 +49,7 @@ a:hover {
   color: #535bf2;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-  color: #000; /* ensure all body text is black */
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
+/* ---------- Buttons ---------- */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -44,6 +58,7 @@ button {
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
+  color: #fff;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -55,16 +70,73 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* Light mode overrides */
+/* ---------- Inputs / Textareas / Selects ---------- */
+textarea,
+input,
+select {
+  font-family: monospace, system-ui, Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  color: #000; /* black text */
+  background-color: #fff; /* white background */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.5em;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  resize: vertical;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  border-color: #646cff; /* focus border */
+  box-shadow: 0 0 0 2px rgba(100,108,255,0.3);
+}
+
+/* ---------- Labels ---------- */
+label {
+  font-weight: 500;
+  margin-bottom: 0.25em;
+  display: block;
+  color: #000;
+}
+
+/* ---------- Dashboard Table ---------- */
+.dashboard-preview table {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: #fff;
+  color: #000; /* ensure table text is black */
+}
+
+.dashboard-preview th,
+.dashboard-preview td {
+  padding: 0.75em 1em;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.dashboard-preview th {
+  background-color: #eee;
+  font-weight: 600;
+}
+
+.dashboard-preview tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+/* ---------- Light Mode Overrides ---------- */
 @media (prefers-color-scheme: light) {
   :root {
-    color: #000; /* black text for light mode */
-    background-color: #f9f9f9; /* light grey background */
+    color: #000; /* text black in light mode */
+    background-color: #f9f9f9; /* light grey */
   }
   a:hover {
     color: #747bff;
   }
   button {
     background-color: #f9f9f9;
+    color: #000;
   }
 }
