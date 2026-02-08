@@ -34,7 +34,8 @@ Include all CSS inline.
 - Heading with report title
 - Paragraph with total spending (sum of all "amount" values)
 - Table with columns: Item and Amount, populated from the JSON
-- Light grey background, professional font, padding, and borders
+- Light grey background (#f9f9f9), dark text (#333)
+- Professional font, padding, borders
 - Fully renderable in a browser
 `;
 
@@ -47,12 +48,14 @@ Currency: ${data.currency}
 Expenses:
 ${data.expenses.map((e) => `- ${e.item}: ${e.amount}`).join("\n")}
 
-Please generate complete HTML with CSS inline for a business dashboard:
-- Show the report title as <h1>
-- Calculate total spending (sum of all amounts)
-- Render a table with all items and their amounts
+Generate complete HTML with CSS inline for a business dashboard:
+- Light grey background (#f9f9f9)
+- Dark text (#333)
+- Professional font (system-ui, Helvetica, Arial)
+- Include total spending calculated from the data
+- Table with all items and amounts filled in
+- Include all table styling inline (borders, header background, alternating row colors)
 - Fill all values directly — do NOT leave placeholders like {{ item }} or {{ total }}
-- Use light grey background and professional fonts
 ${prompt}
 `;
 
