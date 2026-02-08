@@ -1,3 +1,4 @@
+// Force Node.js runtime on Vercel
 export const config = {
   runtime: "nodejs",
 };
@@ -10,9 +11,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log("📦 Request body:", req.body);
-
     const { data, prompt } = req.body;
+    console.log("📦 Request body:", req.body);
 
     if (!data || !prompt) {
       return res.status(400).json({ error: "Missing data or prompt" });
@@ -24,25 +24,34 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Groq API key not configured" });
     }
 
-    // Strong system prompt with inline CSS instructions
+    // Strong system prompt
     const systemPrompt = `
-You are a frontend developer.
-You will receive JSON data in this format:
-{
-  "report_title": "string",
-  "currency": "string",
-  "expenses": [
-    {"item": "string", "amount": number},
-    ...
-  ]
-}
+You are an expert frontend developer.
+You will receive a JSON object containing a report.
 Return ONLY valid HTML and CSS.
-- Include all CSS inline using a <style> tag in the HTML head.
-- Use a professional font (system-ui, Helvetica, Arial) and a light grey background (#f9f9f9).
-- Table should have column headers (Item, Amount), alternating row colors, padding, and borders.
-- Calculate total spending by summing all "amount" values.
-- Do NOT include explanations or external stylesheets.
-- Make HTML fully renderable in a browser.
+Do NOT invent numbers or items — use the JSON exactly.
+Include all CSS inline.
+- Heading with report title
+- Paragraph with total spending (sum of all "amount" values)
+- Table with columns: Item and Amount, with all items from the JSON
+- Light grey background, professional font, padding, borders
+- Fully renderable in a browser
+`;
+
+    // User message includes JSON explicitly and instructions
+    const userMessage = `
+Here is the report data in JSON:
+
+${JSON.stringify(data)}
+
+Please generate HTML and CSS for a dashboard.
+- Show report_title as heading
+- Calculate total spending (sum of all "amount" values")
+- Render a table with all items and amounts
+- Use light grey background and professional fonts
+- Include all CSS inline
+- Do not invent numbers, use the data exactly
+${prompt}
 `;
 
     console.log("🚀 Calling Groq API...");
@@ -59,11 +68,7 @@ Return ONLY valid HTML and CSS.
           model: "llama-3.3-70b-versatile",
           messages: [
             { role: "system", content: systemPrompt },
-            {
-              role: "user",
-              content: `const reportData = ${JSON.stringify(data)};`,
-            },
-            { role: "user", content: prompt },
+            { role: "user", content: userMessage },
           ],
           temperature: 0.2,
           max_tokens: 1500,
