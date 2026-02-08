@@ -1,4 +1,4 @@
-// Force Node.js runtime on Vercel
+// Vercel Node.js runtime
 export const config = {
   runtime: "nodejs",
 };
@@ -27,30 +27,32 @@ export default async function handler(req, res) {
     // Strong system prompt
     const systemPrompt = `
 You are an expert frontend developer.
-You will receive a JSON object containing a report.
+You will receive a report with JSON data.
 Return ONLY valid HTML and CSS.
-Do NOT invent numbers or items — use the JSON exactly.
+Do NOT leave placeholders — fill all values directly.
 Include all CSS inline.
 - Heading with report title
 - Paragraph with total spending (sum of all "amount" values)
-- Table with columns: Item and Amount, with all items from the JSON
-- Light grey background, professional font, padding, borders
+- Table with columns: Item and Amount, populated from the JSON
+- Light grey background, professional font, padding, and borders
 - Fully renderable in a browser
 `;
 
-    // User message includes JSON explicitly and instructions
+    // User message: JSON converted to explicit text values
     const userMessage = `
-Here is the report data in JSON:
+Here is the report data:
 
-${JSON.stringify(data)}
+Title: ${data.report_title}
+Currency: ${data.currency}
+Expenses:
+${data.expenses.map((e) => `- ${e.item}: ${e.amount}`).join("\n")}
 
-Please generate HTML and CSS for a dashboard.
-- Show report_title as heading
-- Calculate total spending (sum of all "amount" values")
-- Render a table with all items and amounts
+Please generate complete HTML with CSS inline for a business dashboard:
+- Show the report title as <h1>
+- Calculate total spending (sum of all amounts)
+- Render a table with all items and their amounts
+- Fill all values directly — do NOT leave placeholders like {{ item }} or {{ total }}
 - Use light grey background and professional fonts
-- Include all CSS inline
-- Do not invent numbers, use the data exactly
 ${prompt}
 `;
 
