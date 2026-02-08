@@ -1,3 +1,7 @@
+export const config = {
+  runtime: "nodejs",
+};
+
 export default async function handler(req, res) {
   console.log("➡️ API route hit");
 
@@ -16,7 +20,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing data or prompt" });
     }
 
-    // Check Groq key
+    // ✅ Check Groq key
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
     if (!GROQ_API_KEY) {
       console.error("❌ GROQ_API_KEY is undefined");
@@ -24,7 +28,6 @@ export default async function handler(req, res) {
     }
     console.log("🔐 Groq key exists");
 
-    // System prompt
     const systemPrompt = `
 You are a frontend developer.
 Return ONLY valid HTML and CSS.
