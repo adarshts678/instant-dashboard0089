@@ -4,8 +4,8 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #000; /* text color changed to black */
+  background-color: #f9f9f9; /* light grey background */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -28,6 +28,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  color: #000; /* ensure all body text is black */
 }
 
 h1 {
@@ -54,10 +55,11 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Light mode overrides */
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: #000; /* black text for light mode */
+    background-color: #f9f9f9; /* light grey background */
   }
   a:hover {
     color: #747bff;
