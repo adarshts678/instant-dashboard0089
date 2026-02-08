@@ -16,55 +16,58 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing data or prompt" });
     }
 
-    // Check OpenAI key from environment variables
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-    if (!OPENAI_API_KEY) {
-      console.error("❌ OPENAI_API_KEY is undefined");
-      return res.status(500).json({ error: "OpenAI API key not configured" });
+    // Check Groq key
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    if (!GROQ_API_KEY) {
+      console.error("❌ GROQ_API_KEY is undefined");
+      return res.status(500).json({ error: "Groq API key not configured" });
     }
-    console.log("🔐 OpenAI key exists");
+    console.log("🔐 Groq key exists");
 
-    // Call OpenAI API
-    console.log("🚀 Calling OpenAI API...");
-    const openaiRes = await fetch(
-      "https://api.openai.com/v1/chat/completions",
+    // System prompt
+    const systemPrompt = `
+You are a frontend developer.
+Return ONLY valid HTML and CSS.
+Do NOT include explanations.
+Use the provided JSON data exactly.
+`;
+
+    console.log("🚀 Calling Groq API...");
+
+    const groqRes = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          Authorization: `Bearer ${GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "gpt-3.5-turbo",
+          model: "llama3-70b-8192",
           messages: [
-            {
-              role: "system",
-              content:
-                "You are a frontend developer. Output only valid HTML/CSS for a dashboard.",
-            },
-            {
-              role: "user",
-              content: `Data: ${JSON.stringify(data)}\nPrompt: ${prompt}`,
-            },
+            { role: "system", content: systemPrompt },
+            { role: "user", content: JSON.stringify(data) },
+            { role: "user", content: prompt },
           ],
-          max_tokens: 1000,
+          temperature: 0.2,
+          max_tokens: 1200,
         }),
       },
     );
 
-    console.log("📡 OpenAI response status:", openaiRes.status);
+    console.log("📡 Groq response status:", groqRes.status);
 
-    if (!openaiRes.ok) {
-      const errorText = await openaiRes.text();
-      console.error("❌ OpenAI API error:", errorText);
-      return res.status(500).json({ error: "OpenAI API request failed" });
+    if (!groqRes.ok) {
+      const errorText = await groqRes.text();
+      console.error("❌ Groq API error:", errorText);
+      return res.status(500).json({ error: "Groq API request failed" });
     }
 
-    const openaiData = await openaiRes.json();
-    console.log("✅ OpenAI response received");
+    const groqData = await groqRes.json();
+    console.log("✅ Groq response received");
 
     const html =
-      openaiData.choices?.[0]?.message?.content ||
+      groqData.choices?.[0]?.message?.content ||
       "<div>AI did not return HTML.</div>";
 
     console.log("📤 Sending HTML response");
