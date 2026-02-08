@@ -1,10 +1,9 @@
-// Vercel Node.js runtime
 export const config = {
   runtime: "nodejs",
 };
 
 export default async function handler(req, res) {
-  console.log("➡️ API route hit");
+  console.log("API route hit");
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -12,7 +11,7 @@ export default async function handler(req, res) {
 
   try {
     const { data, prompt } = req.body;
-    console.log("📦 Request body:", req.body);
+    console.log(" Request body:", req.body);
 
     if (!data || !prompt) {
       return res.status(400).json({ error: "Missing data or prompt" });
@@ -20,11 +19,10 @@ export default async function handler(req, res) {
 
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
     if (!GROQ_API_KEY) {
-      console.error("❌ GROQ_API_KEY is undefined");
+      console.error(" GROQ_API_KEY is undefined");
       return res.status(500).json({ error: "Groq API key not configured" });
     }
 
-    // Strong system prompt
     const systemPrompt = `
 You are an expert frontend developer.
 You will receive a report with JSON data.
@@ -39,7 +37,6 @@ Include all CSS inline.
 - Fully renderable in a browser
 `;
 
-    // User message: JSON converted to explicit text values
     const userMessage = `
 Here is the report data:
 
@@ -59,7 +56,7 @@ Generate complete HTML with CSS inline for a business dashboard:
 ${prompt}
 `;
 
-    console.log("🚀 Calling Groq API...");
+    console.log("Calling Groq API...");
 
     const groqRes = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
@@ -81,25 +78,25 @@ ${prompt}
       },
     );
 
-    console.log("📡 Groq response status:", groqRes.status);
+    console.log("Groq response status:", groqRes.status);
 
     if (!groqRes.ok) {
       const errorText = await groqRes.text();
-      console.error("❌ Groq API error:", errorText);
+      console.error("Groq API error:", errorText);
       return res.status(500).json({ error: "Groq API request failed" });
     }
 
     const groqData = await groqRes.json();
-    console.log("✅ Groq response received");
+    console.log("Groq response received");
 
     const html =
       groqData.choices?.[0]?.message?.content ||
       "<div>AI did not return HTML.</div>";
 
-    console.log("📤 Sending HTML response");
+    console.log("Sending HTML response");
     return res.status(200).json({ html });
   } catch (error) {
-    console.error("🔥 Server error:", error);
+    console.error("Server error:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 }
